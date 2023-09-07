@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+
+// See https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
+const prefix = "\u001B[";
+const postfix = "m";
+const redColor = "31";
+const greenColor = "32";
+const cyanColor = "96";
+const magentaColor = "95";
+const whiteColor = "97";
+const boldFont = ";1"
+const end = prefix + "0" + postfix;
+
+const red = prefix + redColor + postfix;
+const boldRed = prefix + redColor + boldFont + postfix;
+const green = prefix + greenColor + postfix;
+const boldGreen = prefix + greenColor + boldFont + postfix;
+const cyan = prefix + cyanColor + postfix;
+const boldCyan = prefix + cyanColor + boldFont + postfix;
+const magenta = prefix + magentaColor + postfix;
+const boldMagenta = prefix + magentaColor + boldFont + postfix;
+const white = prefix + whiteColor + postfix;
+const boldWhite = prefix + whiteColor + boldFont + postfix;
+
+function color(colorName, text) {
+    return colorName + text + end;
+}
+
+const sourceName = process.env.SOURCE_NAME || "SOURCE";
+const operationName = process.env.OPERATION_NAME || "CONSUME";
+const topicName = process.env.TOPIC_NAME || "MYTOPIC";
+const isError = process.env.IS_ERROR && process.env.IS_ERROR === "true";
+
+function clearConsole() {
+    process.stdout.write('\x1B[H\x1B[2J');
+}
+
+function logOne() {
+    console.log("[" + color(boldWhite, sourceName) + "]: " +
+                color(boldCyan, operationName) + " event to topic: " + color(boldMagenta, topicName));
+    if (!isError) {
+        console.log("> " + color(boldGreen, "Success!"));
+    }
+    else
+    {
+        console.log("> " + color(boldRed, "Error!") +
+        ' level=info error="' + color(boldRed, '"kafka server: The client is not authorized to access this topic"')
+        );
+    }
+}
+
+clearConsole();
+setInterval(logOne, 1100);
+
